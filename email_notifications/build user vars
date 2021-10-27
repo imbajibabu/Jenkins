@@ -1,0 +1,10 @@
+Variables provided
+The plugin provides the following environment variables:
+
+Variable	            Description
+BUILD_USER	            Full name (first name + last name)
+BUILD_USER_FIRST_NAME	First name
+BUILD_USER_LAST_NAME	Last name
+BUILD_USER_ID	        Jenkins user ID
+BUILD_USER_GROUPS	    Jenkins user groups
+BUILD_USER_EMAIL	    Email address

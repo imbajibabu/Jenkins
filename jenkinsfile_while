@@ -1,0 +1,18 @@
+pipeline {
+
+    agent any
+
+    stages {
+        stage ('While loop stage') {
+            steps {
+            script {
+                while(count<5) {
+                println(count);
+                count++;
+            }
+            }
+            }
+        }
+    }
+}
+

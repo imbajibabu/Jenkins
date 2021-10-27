@@ -1,0 +1,278 @@
+when
+The when directive allows the Pipeline to determine whether the stage should be executed depending on the given condition. The when directive must contain at least one condition. If the when directive contains more than one condition, all the child conditions must return true for the stage to execute. This is the same as if the child conditions were nested in an allOf condition (see the examples below). If an anyOf condition is used, note that the condition skips remaining tests as soon as the first "true" condition is found.
+
+More complex conditional structures can be built using the nesting conditions: not, allOf, or anyOf. Nesting conditions may be nested to any arbitrary depth.
+
+Required No
+
+Parameters None
+
+Allowed Inside a stage directive
+
+Built-in Conditions
+branch
+Execute the stage when the branch being built matches the branch pattern (ANT style path glob) given, for example: when { branch 'master' }. Note that this only works on a multibranch Pipeline.
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: EQUALS for a simple string comparison, GLOB (the default) for an ANT style path glob (same as for example changeset), or REGEXP for regular expression matching. For example: when { branch pattern: "release-\\d+", comparator: "REGEXP"}
+
+buildingTag
+Execute the stage when the build is building a tag. Example: when { buildingTag() }
+
+changelog
+Execute the stage if the build’s SCM changelog contains a given regular expression pattern, for example: when { changelog '.*^\\[DEPENDENCY\\] .+$' }
+
+changeset
+Execute the stage if the build’s SCM changeset contains one or more files matching the given pattern. Example: when { changeset "**/*.js" }
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: EQUALS for a simple string comparison, GLOB (the default) for an ANT style path glob case insensitive, this can be turned off with the caseSensitive parameter, or REGEXP for regular expression matching. For example: when { changeset pattern: ".TEST\\.java", comparator: "REGEXP" } or when { changeset pattern: "*/*TEST.java", caseSensitive: true }
+
+changeRequest
+Executes the stage if the current build is for a "change request" (a.k.a. Pull Request on GitHub and Bitbucket, Merge Request on GitLab, Change in Gerrit, etc.). When no parameters are passed the stage runs on every change request, for example: when { changeRequest() }.
+
+By adding a filter attribute with parameter to the change request, the stage can be made to run only on matching change requests. Possible attributes are id, target, branch, fork, url, title, author, authorDisplayName, and authorEmail. Each of these corresponds to a CHANGE_* environment variable, for example: when { changeRequest target: 'master' }.
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: EQUALS for a simple string comparison (the default), GLOB for an ANT style path glob (same as for example changeset), or REGEXP for regular expression matching. Example: when { changeRequest authorEmail: "[\\w_-.]+@example.com", comparator: 'REGEXP' }
+
+environment
+Execute the stage when the specified environment variable is set to the given value, for example: when { environment name: 'DEPLOY_TO', value: 'production' }
+
+equals
+Execute the stage when the expected value is equal to the actual value, for example: when { equals expected: 2, actual: currentBuild.number }
+
+expression
+Execute the stage when the specified Groovy expression evaluates to true, for example: when { expression { return params.DEBUG_BUILD } } Note that when returning strings from your expressions they must be converted to booleans or return null to evaluate to false. Simply returning "0" or "false" will still evaluate to "true".
+
+tag
+Execute the stage if the TAG_NAME variable matches the given pattern. Example: when { tag "release-*" }. If an empty pattern is provided the stage will execute if the TAG_NAME variable exists (same as buildingTag()).
+
+The optional parameter comparator may be added after an attribute to specify how any patterns are evaluated for a match: EQUALS for a simple string comparison, GLOB (the default) for an ANT style path glob (same as for example changeset), or REGEXP for regular expression matching. For example: when { tag pattern: "release-\\d+", comparator: "REGEXP"}
+
+not
+Execute the stage when the nested condition is false. Must contain one condition. For example: when { not { branch 'master' } }
+
+allOf
+Execute the stage when all of the nested conditions are true. Must contain at least one condition. For example: when { allOf { branch 'master'; environment name: 'DEPLOY_TO', value: 'production' } }
+
+anyOf
+Execute the stage when at least one of the nested conditions is true. Must contain at least one condition. For example: when { anyOf { branch 'master'; branch 'staging' } }
+
+triggeredBy
+Execute the stage when the current build has been triggered by the param given. For example:
+
+when { triggeredBy 'SCMTrigger' }
+
+when { triggeredBy 'TimerTrigger' }
+
+when { triggeredBy 'UpstreamCause' }
+
+when { triggeredBy cause: "UserIdCause", detail: "vlinde" }
+
+Evaluating when before entering agent in a stage
+By default, the when condition for a stage will be evaluated after entering the agent for that stage, if one is defined. However, this can be changed by specifying the beforeAgent option within the when block. If beforeAgent is set to true, the when condition will be evaluated first, and the agent will only be entered if the when condition evaluates to true.
+
+Evaluating when before the input directive
+By default, the when condition for a stage will not be evaluated before the input, if one is defined. However, this can be changed by specifying the beforeInput option within the when block. If beforeInput is set to true, the when condition will be evaluated first, and the input will only be entered if the when condition evaluates to true.
+
+beforeInput true takes precedence over beforeAgent true.
+
+Evaluating when before the options directive
+By default, the when condition for a stage will be evaluated after entering the options for that stage, if any are defined. However, this can be changed by specifying the beforeOptions option within the when block. If beforeOptions is set to true, the when condition will be evaluated first, and the options will only be entered if the when condition evaluates to true.
+
+beforeOptions true takes precedence over beforeInput true and beforeAgent true.
+
+Example 15. Single Condition, Declarative Pipeline
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                branch 'production'
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 16. Multiple Condition, Declarative Pipeline
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                branch 'production'
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 17. Nested condition (same behavior as previous example)
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                allOf {
+                    branch 'production'
+                    environment name: 'DEPLOY_TO', value: 'production'
+                }
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 18. Multiple condition and nested condition
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                branch 'production'
+                anyOf {
+                    environment name: 'DEPLOY_TO', value: 'production'
+                    environment name: 'DEPLOY_TO', value: 'staging'
+                }
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 19. Expression condition and nested condition
+pipeline {
+    agent any
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                expression { BRANCH_NAME ==~ /(production|staging)/ }
+                anyOf {
+                    environment name: 'DEPLOY_TO', value: 'production'
+                    environment name: 'DEPLOY_TO', value: 'staging'
+                }
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 20. beforeAgent
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            agent {
+                label "some-label"
+            }
+            when {
+                beforeAgent true
+                branch 'production'
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 21. beforeInput
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                beforeInput true
+                branch 'production'
+            }
+            input {
+                message "Deploy to production?"
+                id "simple-input"
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}
+Example 22. beforeOptions
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                beforeOptions true
+                branch 'testing'
+            }
+            options {
+                lock label: 'testing-deploy-envs', quantity: 1, variable: 'deployEnv'
+            }
+            steps {
+                echo "Deploying to ${deployEnv}"
+            }
+        }
+    }
+}
+Example 23. triggeredBy
+pipeline {
+    agent none
+    stages {
+        stage('Example Build') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('Example Deploy') {
+            when {
+                triggeredBy "TimerTrigger"
+            }
+            steps {
+                echo 'Deploying'
+            }
+        }
+    }
+}

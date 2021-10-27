@@ -1,0 +1,21 @@
+https://www.jenkins.io/doc/pipeline/steps/pipeline-utility-steps/
+
+compareVersions: Compare two version number strings
+findFiles: Find files in the workspace
+nodesByLabel: List of nodes by Label, by default excludes offline
+readCSV: Read content from a CSV file in the workspace.
+readJSON: Read JSON from files in the workspace.
+readManifest: Read a Jar Manifest
+readMavenPom: Read a maven project file.
+readProperties: Read properties from files in the workspace or text.
+readYaml: Read yaml from files in the workspace or text.
+sha1: Compute the SHA1 of a given file
+sha256: Compute the SHA256 of a given file
+tee: Tee output to file
+touch: Create a file (if not already exist) in the workspace, and set the timestamp
+unzip: Extract Zip file
+zip: Create Zip file
+writeCSV: Write content to a CSV file in the workspace.
+writeJSON: Write JSON to a file in the workspace.
+writeMavenPom: Write a maven project file.
+writeYaml: Write a yaml from an object or objects.

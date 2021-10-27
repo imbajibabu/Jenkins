@@ -1,0 +1,11 @@
+add jenkins user to root group:
+
+sudo usermod -aG root jenkins
+
+To change the user’s default shell, run the command with the -s option followed the absolute path of the shell and the name of the user:
+usermod -s /bin/bash jenkins
+
+ln -s /usr/local/bin/aws /bin/aws
+
+vim /etc/sysconfig/jenkins
+JENKINS_USER="root"

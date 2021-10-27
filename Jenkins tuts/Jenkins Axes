@@ -1,0 +1,45 @@
+axes
+The axes section specifies one or more axis directives. Each axis consists of a name and a list of values. All the values from each axis are combined with the others to produce the cells.
+
+Example 27. One-axis with 3 cells
+matrix {
+    axes {
+        axis {
+            name 'PLATFORM'
+            values 'linux', 'mac', 'windows'
+        }
+    }
+    // ...
+}
+Example 28. Two-axis with 12 cells (three by four)
+matrix {
+    axes {
+        axis {
+            name 'PLATFORM'
+            values 'linux', 'mac', 'windows'
+        }
+        axis {
+            name 'BROWSER'
+            values 'chrome', 'edge', 'firefox', 'safari'
+        }
+    }
+    // ...
+}
+Example 29. Three-axis matrix with 24 cells (three by four by two)
+matrix {
+    axes {
+        axis {
+            name 'PLATFORM'
+            values 'linux', 'mac', 'windows'
+        }
+        axis {
+            name 'BROWSER'
+            values 'chrome', 'edge', 'firefox', 'safari'
+        }
+        axis {
+            name 'ARCHITECTURE'
+            values '32-bit', '64-bit'
+        }
+    }
+    // ...
+}

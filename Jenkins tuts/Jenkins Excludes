@@ -1,0 +1,92 @@
+excludes (optional)
+The optional excludes section lets authors specify one or more exclude filter expressions that select cells to be excluded from the expanded set of matrix cells (aka, sparsening). Filters are constructed using a basic directive structure of one or more of exclude axis directives each with a name and values list.
+
+The axis directives inside an exclude generate a set of combinations (similar to generating the matrix cells). The matrix cells that match all the values from an exclude combination are removed from the matrix. If more than one exclude directive is supplied, each is evaluated separately to remove cells.
+
+When dealing with a long list of values to exclude, exclude axis directives can use notValues instead of values. These will exclude cells that do not match one of the values passed to notValues.
+
+Example 32. Three-axis matrix with 24 cells, exclude '32-bit, mac' (4 cells excluded)
+matrix {
+    axes {
+        axis {
+            name 'PLATFORM'
+            values 'linux', 'mac', 'windows'
+        }
+        axis {
+            name 'BROWSER'
+            values 'chrome', 'edge', 'firefox', 'safari'
+        }
+        axis {
+            name 'ARCHITECTURE'
+            values '32-bit', '64-bit'
+        }
+    }
+    excludes {
+        exclude {
+            axis {
+                name 'PLATFORM'
+                values 'mac'
+            }
+            axis {
+                name 'ARCHITECTURE'
+                values '32-bit'
+            }
+        }
+    }
+    // ...
+}
+Exclude the linux, safari combination and exclude any platform that is not windows with the edge browser.
+
+Example 33. Three-axis matrix with 24 cells, exclude '32-bit, mac' and invalid browser combinations (9 cells excluded)
+matrix {
+    axes {
+        axis {
+            name 'PLATFORM'
+            values 'linux', 'mac', 'windows'
+        }
+        axis {
+            name 'BROWSER'
+            values 'chrome', 'edge', 'firefox', 'safari'
+        }
+        axis {
+            name 'ARCHITECTURE'
+            values '32-bit', '64-bit'
+        }
+    }
+    excludes {
+        exclude {
+            // 4 cells
+            axis {
+                name 'PLATFORM'
+                values 'mac'
+            }
+            axis {
+                name 'ARCHITECTURE'
+                values '32-bit'
+            }
+        }
+        exclude {
+            // 2 cells
+            axis {
+                name 'PLATFORM'
+                values 'linux'
+            }
+            axis {
+                name 'BROWSER'
+                values 'safari'
+            }
+        }
+        exclude {
+            // 3 more cells and '32-bit, mac' (already excluded)
+            axis {
+                name 'PLATFORM'
+                notValues 'windows'
+            }
+            axis {
+                name 'BROWSER'
+                values 'edge'
+            }
+        }
+    }
+    // ...
+}

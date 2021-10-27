@@ -1,0 +1,25 @@
+@Library("shared_library@master") _
+
+pipeline {
+    agent any
+    stages ('Shared Library Example') {
+        stage ('shared library') {
+            steps {
+                heartQ()
+                //helloWorldExternal(dayOfWeek:'Monday', name:'Jithendar')
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs ()
+        }
+    }
+}
+
+
+// def call(Map config = [:]) {
+//     sh "echo Hello ${config.name}. Today is ${config.dayOfWeek}."
+// }
+
+//Might be a branch name, tag, commit hash, etc., according to the SCM.
